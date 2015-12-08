@@ -16,8 +16,8 @@ function compile(watch) {
       .pipe(source('app.js'))
       .pipe(buffer())
       .pipe(uglify())
-//      .pipe(sourcemaps.init({ loadMaps: true }))
-//      .pipe(sourcemaps.write('./'))
+      .pipe(sourcemaps.init({ loadMaps: true }))
+      .pipe(sourcemaps.write('./'))
       .pipe(gulp.dest('./dist'))
   }
 
