@@ -4,7 +4,18 @@ import ReactDOM from 'react-dom'
 import paper from 'paper/dist/paper-full'
 
 class App extends React.Component {
-  regenerateSegments () {
+  constructor (props) {
+    super(props)
+
+    // Bind methods
+    this.resetLogo = this.resetLogo.bind(this)
+  }
+
+  resetLogo () {
+    this.regenerateSegments(10)
+  }
+
+  regenerateSegments (width) {
     let logo = window.paper.project.layers[0] ? window.paper.project.layers[0].children['logo'] : false
     let skintones = [
       '#f9da9d',
@@ -16,8 +27,8 @@ class App extends React.Component {
     logo.children.map((segment) => {
       // Store old state, generate a new one
       let oldWidth = segment.strokeWidth
-      let newWidth = Math.random() * 50
-
+      let newWidth = typeof width === 'number' ? width : Math.random() * 50
+      console.log(typeof width)
       // Set a color
       segment.strokeColor = currentColor
 
@@ -36,6 +47,22 @@ class App extends React.Component {
     paper.view.update()
   }
 
+  handleMouseEnter (segment, event) {
+    let oldWidth = segment.strokeWidth
+    let newWidth = Math.random() * 50
+
+    segment.onFrame = (event) => {
+      if (newWidth > oldWidth && segment.strokeWidth < newWidth) {
+        segment.strokeWidth *= 1.1
+      } else if (newWidth < oldWidth && segment.strokeWidth > newWidth) {
+        segment.strokeWidth *= 0.9
+      } else if ((newWidth < oldWidth && segment.strokeWidth <= newWidth) ||
+        (newWidth > oldWidth && segment.strokeWidth >= newWidth)) {
+        newWidth = Math.random() * 50
+      }
+    }
+  }
+
   componentWillMount () {
     window.paper = paper.setup(canvas)
     paper.project.importSVG('./assets/htb.svg', (logo) => {
@@ -44,6 +71,16 @@ class App extends React.Component {
       logo.pivot = logo.bounds.topLeft
       logo.position = new paper.Point(50, 50)
 
+      // Bind mouse events
+      logo.children.map((segment) => {
+        segment.on('mouseenter', (event) => {
+          this.handleMouseEnter(segment, event)
+        })
+        segment.on('mouseleave', (event) => {
+          segment.onFrame = () => {}
+        })
+      })
+
       // Give all segments a color and stroke width
       this.regenerateSegments()
     })
@@ -51,7 +88,10 @@ class App extends React.Component {
 
   render () {
     return (
-      <button onClick={this.regenerateSegments}>Another one bites the dust</button>
+      <section>
+        <p><button onClick={this.regenerateSegments}>Regenerate</button></p>
+        <p><button onClick={this.resetLogo}>Strip</button></p>
+      </section>
     )
   }
 }
