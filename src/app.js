@@ -6,11 +6,19 @@ import paper from 'paper/dist/paper-full'
 class App extends React.Component {
   regenerateSegments () {
     let logo = window.paper.project.layers[0] ? window.paper.project.layers[0].children['logo'] : false
+    let skintones = [
+      '#f9da9d',
+      '#d8ae84',
+      '#664d3c'
+    ]
+    let currentColor = skintones[Math.floor(Math.random() * skintones.length)]
     if (logo) {
       logo.children.map((segment) => {
+        segment.strokeColor = currentColor
         segment.strokeWidth = 40 * Math.random()
       })
     }
+
     window.paper.view.update()
   }
 

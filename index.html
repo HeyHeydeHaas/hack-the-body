@@ -6,16 +6,25 @@
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-    <article>
-      <time>Tue 8 Dec 10:40</time>
-      <p>
-        Maybe the letters are collections of segments and each segment can grow.
-        Like with the human body, the growing seems organic. Like with hackable objects,
-        letters have components that can change. Click the button to see a new generation.
-      </p>
-    </article>
-    <canvas id="canvas"></canvas>
-    <main id="app"></main>
+    <aside>
+      <h1>Hack the Body</h1>
+      <article>
+        <time>Tue 8 Dec 10:40</time>
+        <p>
+          Maybe the letters are collections of segments and each segment can grow.
+          Like with the human body, the growing seems organic. Like with hackable objects,
+          letters have components that can change. The segments are divided across each
+          letter in an asymmetrical way, to make everything look even more organic.
+          Click the button to see a new generation.
+        </p>
+      </article>
+      <section id="app"></section>
+    </aside>
+
+    <main>
+      <canvas id="canvas" data-paper-resize="true"></canvas>
+    </main>
+
     <script src="dist/app.js"></script>
 </body>
 </html>

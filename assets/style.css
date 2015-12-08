@@ -1,12 +1,22 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 body {
   font-family: sans-serif;
   font-size: 0.8em;
   line-height: 1.5;
   letter-spacing: 0.5pt;
+  display: flex;
+}
+aside {
+  float: left;
+  width: 25em;
+  margin-bottom: 2em;
+  padding: 2em;
 }
 article {
-  width: 80%;
-  max-width: 50em;
   padding: 1em 0;
   margin: 2em 0;
   border-bottom: 1em solid #f0f0f0;
@@ -14,8 +24,25 @@ article {
 time {
   font-style: italic;
 }
+button {
+  background: #101010;
+  color: #f0f0f0;
+  border: 0;
+  padding: 1.5em;
+  border-radius: 1em;
+}
+main {
+  flex-grow: 3;
+  width: 100%;
+  float: left;
+}
 canvas {
-  width: 550px;
-  height: 550px;
-  border: 2px solid #f0f0f0;
+  width: 100%;
+  min-height: 600px;
+  border-left: 2px solid #f0f0f0;
+}
+@media screen and (max-width: 750px) {
+  body {
+    display: block;
+  }
 }
