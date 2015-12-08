@@ -4,8 +4,8 @@ import ReactDOM from 'react-dom'
 import paper from 'paper/dist/paper-full'
 
 class App extends React.Component {
-  handleHover (segment, e) {
-    segment.strokeWidth *= e.event.shiftKey ? 0.99 : 1.01
+  handleClick (segment, e) {
+    segment.strokeWidth *= e.event.shiftKey ? 0.9 : 1.15
   }
 
   resetLogo () {
@@ -34,8 +34,8 @@ class App extends React.Component {
       logo.children.map((segment) => {
         segment.strokeColor = currentColor
         segment.strokeWidth = 10
-        segment.on('mousemove', (event) => {
-          this.handleHover(segment, event)
+        segment.on('click', (event) => {
+          this.handleClick(segment, event)
         })
       })
     })
