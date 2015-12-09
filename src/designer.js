@@ -22,6 +22,7 @@ class App extends React.Component {
     // Bind methods
     this.resetLogo = this.resetLogo.bind(this)
     this.handleClick = this.handleClick.bind(this)
+    this.handleMouseEnter = this.handleMouseEnter.bind(this)
     this.regenerateSegments = this.regenerateSegments.bind(this)
   }
 
@@ -40,7 +41,7 @@ class App extends React.Component {
     logo.children.map((segment) => {
       // Store old state, generate a new one
       let oldWidth = segment.strokeWidth
-      let newWidth = typeof width === 'number' ? width : Math.random() * 50 + 3
+      let newWidth = typeof width === 'number' ? width : Math.random() * 50
 
       // Set a color
       segment.strokeColor = this.state.currentColor
@@ -62,6 +63,10 @@ class App extends React.Component {
 
   handleClick (segment, event) {
     this.randomizeSegment(segment, false)
+  }
+
+  handleMouseEnter (segment, event) {
+    this.randomizeSegment(segment, true)
   }
 
   randomizeSegment (segment, loop) {
@@ -102,10 +107,10 @@ class App extends React.Component {
           this.handleClick(segment, event)
         })
         segment.on('mouseenter', (event) => {
-          segment.opacity = 0.8
+          this.handleMouseEnter(segment, event)
         })
         segment.on('mouseleave', (event) => {
-          segment.opacity = 1
+          segment.onFrame = () => {}
         })
       })
 
