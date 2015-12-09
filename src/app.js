@@ -1,6 +1,7 @@
 /* global canvas, app */
 import React from 'react'
 import ReactDOM from 'react-dom'
+import request from 'request'
 import paper from 'paper/dist/paper-full'
 
 class App extends React.Component {
@@ -66,7 +67,7 @@ class App extends React.Component {
 
   randomizeSegment (segment, loop) {
     let oldWidth = segment.strokeWidth
-    let newWidth = Math.random() * 50
+    let newWidth = Math.random() * 50 + 3
 
     segment.onFrame = (event) => {
       // If we're increasing in size
@@ -79,7 +80,7 @@ class App extends React.Component {
         (newWidth > oldWidth && segment.strokeWidth >= newWidth)) {
         // If we want to loop, just pick a new random value
         if (loop) {
-          newWidth = Math.random() * 50
+          newWidth = Math.random() * 50 + 3
         // Otherwise, unbind this function
         } else {
           segment.onFrame = () => {}
@@ -88,9 +89,15 @@ class App extends React.Component {
     }
   }
 
+  downloadFile () {
+    request('http://io.accommodavid.sexy/', (error, response, body) => {
+      console.log(body)
+    })
+  }
+
   componentWillMount () {
     window.paper = paper.setup(canvas)
-    paper.project.importSVG('./assets/htb.svg', (logo) => {
+    paper.project.importSVG('./assets/htb_grainy.svg', (logo) => {
       // Place the logo 50px from the corner
       logo.name = 'logo'
       logo.pivot = logo.bounds.topLeft
@@ -119,6 +126,7 @@ class App extends React.Component {
       <section>
         <p><button onClick={this.regenerateSegments}>Regenerate</button></p>
         <p><button onClick={this.resetLogo}>Strip</button></p>
+        <p><button onClick={this.downloadFile}>Download</button></p>
       </section>
     )
   }
