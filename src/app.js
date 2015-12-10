@@ -1,8 +1,8 @@
 /* global canvas, app */
 import React from 'react'
 import ReactDOM from 'react-dom'
-import request from 'request'
 import paper from 'paper/dist/paper-full'
+import LetterForm from './letterform'
 
 class App extends React.Component {
   constructor (props) {
@@ -17,117 +17,97 @@ class App extends React.Component {
 
     // Set state
     this.state = {
-      currentColor: 0
+      color: 0,
+      text: 'Hack the Body',
+      width: 0,
+      height: 0,
+      center: 0,
+      rows: 0,
+      cols: 0,
+      margin: 100,
+      spacing: 100,
+      lineheight: 300,
+      size: ''
     }
 
     // Bind methods
-    this.resetLogo = this.resetLogo.bind(this)
-    this.handleClick = this.handleClick.bind(this)
-    this.regenerateSegments = this.regenerateSegments.bind(this)
+    this.update = this.update.bind(this)
+    this.setSize = this.setSize.bind(this)
   }
 
-  resetLogo () {
-    this.regenerateSegments(10)
-  }
-
-  regenerateSegments (width) {
-    let logo = window.paper.project.layers[0] ? window.paper.project.layers[0].children['logo'] : false
-    if (typeof width !== 'number') {
-      this.setState({
-        currentColor: this.skintones[Math.floor(Math.random() * this.skintones.length)]
-      })
-    }
-
-    logo.children.map((segment) => {
-      // Store old state, generate a new one
-      let oldWidth = segment.strokeWidth
-      let newWidth = typeof width === 'number' ? width : Math.random() * 50 + 3
-
-      // Set a color
-      segment.strokeColor = this.state.currentColor
-
-      // Animate until the values are correct
-      segment.onFrame = (event) => {
-        if (segment.strokeWidth > newWidth && oldWidth > newWidth) {
-          segment.strokeWidth *= 0.9
-        } else if (segment.strokeWidth < newWidth && oldWidth < newWidth) {
-          segment.strokeWidth *= 1.1
-        } else {
-          segment.strokeWidth = newWidth
-          segment.onFrame = () => {}
-        }
-      }
-    })
-    paper.view.update()
-  }
-
-  handleClick (segment, event) {
-    this.randomizeSegment(segment, false)
-  }
-
-  randomizeSegment (segment, loop) {
-    let oldWidth = segment.strokeWidth
-    let newWidth = Math.random() * 50 + 3
-
-    segment.onFrame = (event) => {
-      // If we're increasing in size
-      if (newWidth > oldWidth && segment.strokeWidth < newWidth) {
-        segment.strokeWidth *= 1.1
-      // If we're decreasing in size
-      } else if (newWidth < oldWidth && segment.strokeWidth > newWidth) {
-        segment.strokeWidth *= 0.9
-      } else if ((newWidth < oldWidth && segment.strokeWidth <= newWidth) ||
-        (newWidth > oldWidth && segment.strokeWidth >= newWidth)) {
-        // If we want to loop, just pick a new random value
-        if (loop) {
-          newWidth = Math.random() * 50 + 3
-        // Otherwise, unbind this function
-        } else {
-          segment.onFrame = () => {}
-        }
-      }
-    }
-  }
-
-  downloadFile () {
-    request('http://io.accommodavid.sexy/', (error, response, body) => {
-      console.log(body)
+  /**
+   * Universal update function that catches events from children
+   */
+  update (event) {
+    this.setState({
+      [event.target.id]: event.target.value,
+      unsavedChanges: true
     })
   }
 
+  /**
+   * Saves the size of the canvas to the state
+   */
+  setSize () {
+    let cols = Math.floor(paper.view.bounds.width / this.state.spacing)
+    let rows = Math.floor(paper.view.bounds.height / this.state.lineheight)
+
+    this.setState({
+      width: paper.view.bounds.width,
+      height: paper.view.bounds.height,
+      center: paper.view.center,
+      cols,
+      rows
+    })
+  }
+
+  /**
+   * Initializes the App
+   */
   componentWillMount () {
+    // Set up Paper
     window.paper = paper.setup(canvas)
-    paper.project.importSVG('./assets/htb_grainy.svg', (logo) => {
-      // Place the logo 50px from the corner
-      logo.name = 'logo'
-      logo.pivot = logo.bounds.topLeft
-      logo.position = new paper.Point(50, 50)
 
-      // Bind mouse events
-      logo.children.map((segment) => {
-        segment.on('click', (event) => {
-          this.handleClick(segment, event)
-        })
-        segment.on('mouseenter', (event) => {
-          segment.opacity = 0.8
-        })
-        segment.on('mouseleave', (event) => {
-          segment.opacity = 1
-        })
-      })
+    // Set initial size
+    this.setSize()
 
-      // Give all segments a color and stroke width
-      this.regenerateSegments()
+    this.setState({
+      color: this.skintones[Math.floor(Math.random() * this.skintones.length)]
     })
+
+    // Recenter on window resize
+    window.addEventListener('resize', this.setSize)
   }
 
   render () {
+    let letters = []
+
+    if (window.paper) {
+      let paper = window.paper
+
+      // Create elements for all letters
+      letters = Array.prototype.map.call(this.state.text, (char, index) => {
+        return <LetterForm
+                  char={char}
+                  fulltext={this.state.text}
+                  color={this.state.color}
+                  margin={this.state.margin}
+                  spacing={this.state.spacing}
+                  lineheight={this.state.lineheight}
+                  cols={this.state.cols}
+                  rows={this.state.rows}
+                  iterator={index}
+                  key={index} />
+      })
+
+      // Handle zooming
+      paper.view.update()
+    }
     return (
-      <section>
-        <p><button onClick={this.regenerateSegments}>Regenerate</button></p>
-        <p><button onClick={this.resetLogo}>Strip</button></p>
-        <p><button onClick={this.downloadFile}>Download</button></p>
-      </section>
+      <div>
+        <textarea value={this.state.text} onChange={this.update} id='text' />
+        {letters}
+      </div>
     )
   }
 }
