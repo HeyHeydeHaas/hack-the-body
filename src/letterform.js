@@ -15,6 +15,7 @@ export default class LetterForm extends React.Component {
     this.place = this.place.bind(this)
     this.resetLogo = this.resetLogo.bind(this)
     this.handleClick = this.handleClick.bind(this)
+    this.importLetter = this.importLetter.bind(this)
     this.regenerateSegments = this.regenerateSegments.bind(this)
   }
 
@@ -76,9 +77,13 @@ export default class LetterForm extends React.Component {
     }
   }
 
-  componentWillMount () {
+  /**
+   * Imports the letter and generates widths for each segment
+   */
+  importLetter (newChar) {
     let paper = window.paper
-    let char = this.props.char === ' ' ? 'space' : this.props.char.toLowerCase()
+    let char = newChar ? newChar : this.props.char
+    char = char === ' ' ? 'space' : char.toLowerCase()
     let path = './assets/letters/' + char + '.svg'
 
     paper.project.importSVG(path, (letter) => {
@@ -110,6 +115,10 @@ export default class LetterForm extends React.Component {
     })
   }
 
+  componentWillMount () {
+    this.importLetter()
+  }
+
   /**
    * Removes the letterform
    */
@@ -120,6 +129,16 @@ export default class LetterForm extends React.Component {
 
     // Update to reflect the changes
     window.paper.view.update()
+  }
+
+  /**
+   * Updates if there is a new letter
+   */
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.char !== this.props.char || nextProps.iterator !== this.props.iterator) {
+      this.componentWillUnmount()
+      this.importLetter(nextProps.char)
+    }
   }
 
   /**
