@@ -78,7 +78,7 @@ export default class LetterForm extends React.Component {
 
   componentWillMount () {
     let paper = window.paper
-    let char = this.props.char === ' ' ? 'space' : this.props.char
+    let char = this.props.char === ' ' ? 'space' : this.props.char.toLowerCase()
     let path = './assets/letters/' + char + '.svg'
 
     paper.project.importSVG(path, (letter) => {
