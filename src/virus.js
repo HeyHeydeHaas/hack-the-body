@@ -16,34 +16,34 @@ class App extends React.Component {
 
     // Set state
     this.state = {
-      currentColor: 0
+      currentColor: this.skintones[Math.floor(Math.random() * this.skintones.length)]
     }
 
     // Bind methods
-    this.resetLogo = this.resetLogo.bind(this)
+    this.infectLogo = this.infectLogo.bind(this)
     this.handleClick = this.handleClick.bind(this)
+    this.handleMouseEnter = this.handleMouseEnter.bind(this)
     this.regenerateSegments = this.regenerateSegments.bind(this)
   }
 
-  resetLogo () {
-    this.regenerateSegments(10)
+  infectLogo () {
+    this.regenerateSegments('square')
   }
 
-  regenerateSegments (width) {
+  regenerateSegments (caps) {
     let logo = window.paper.project.layers[0] ? window.paper.project.layers[0].children['logo'] : false
-    if (typeof width !== 'number') {
-      this.setState({
-        currentColor: this.skintones[Math.floor(Math.random() * this.skintones.length)]
-      })
-    }
+    if (logo.children['clone']) logo.children['clone'].remove()
 
     logo.children.map((segment) => {
       // Store old state, generate a new one
       let oldWidth = segment.strokeWidth
-      let newWidth = typeof width === 'number' ? width : Math.random() * 50
+      let newWidth = Math.random() * 50 + 3
 
       // Set a color
       segment.strokeColor = this.state.currentColor
+
+      // Set the stroke caps
+      segment.strokeCap = typeof caps === 'string' ? caps : 'round'
 
       // Animate until the values are correct
       segment.onFrame = (event) => {
@@ -61,10 +61,39 @@ class App extends React.Component {
   }
 
   handleClick (segment, event) {
-    let clone = segment.firstCurve.path.split(segment.firstCurve.path.length * 0.5)
+    this.randomizeSegment(segment, false)
+  }
+
+  handleMouseEnter (segment, event) {
+    let clone = segment.clone()
     clone.strokeWidth = Math.random() * 50 + 3
-    clone.position.y -= 5
-    clone.position.x -= 5
+    clone.rotation = 90
+    clone.scaling = 0.5
+    clone.name = 'clone'
+  }
+
+  randomizeSegment (segment, loop) {
+    let oldWidth = segment.strokeWidth
+    let newWidth = Math.random() * 50
+
+    segment.onFrame = (event) => {
+      // If we're increasing in size
+      if (newWidth > oldWidth && segment.strokeWidth < newWidth) {
+        segment.strokeWidth *= 1.1
+      // If we're decreasing in size
+      } else if (newWidth < oldWidth && segment.strokeWidth > newWidth) {
+        segment.strokeWidth *= 0.9
+      } else if ((newWidth < oldWidth && segment.strokeWidth <= newWidth) ||
+        (newWidth > oldWidth && segment.strokeWidth >= newWidth)) {
+        // If we want to loop, just pick a new random value
+        if (loop) {
+          newWidth = Math.random() * 50
+        // Otherwise, unbind this function
+        } else {
+          segment.onFrame = () => {}
+        }
+      }
+    }
   }
 
   componentWillMount () {
@@ -80,6 +109,12 @@ class App extends React.Component {
         segment.on('click', (event) => {
           this.handleClick(segment, event)
         })
+        segment.on('mouseenter', (event) => {
+          this.handleMouseEnter(segment, event)
+        })
+        segment.on('mouseleave', (event) => {
+          segment.onFrame = () => {}
+        })
       })
 
       // Give all segments a color and stroke width
@@ -91,7 +126,7 @@ class App extends React.Component {
     return (
       <section>
         <p><button onClick={this.regenerateSegments}>Regenerate</button></p>
-        <p><button onClick={this.resetLogo}>Strip</button></p>
+        <p><button onClick={this.infectLogo}>Infect</button></p>
       </section>
     )
   }
