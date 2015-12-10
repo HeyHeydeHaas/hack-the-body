@@ -16,16 +16,26 @@ class App extends React.Component {
 
     // Set state
     this.state = {
-      currentColor: this.skintones[Math.floor(Math.random() * this.skintones.length)]
+      currentColor: 0
     }
 
     // Bind methods
-    this.resizeSegment = this.resizeSegment.bind(this)
+    this.resetLogo = this.resetLogo.bind(this)
+    this.handleClick = this.handleClick.bind(this)
     this.regenerateSegments = this.regenerateSegments.bind(this)
+  }
+
+  resetLogo () {
+    this.regenerateSegments(10)
   }
 
   regenerateSegments (width) {
     let logo = window.paper.project.layers[0] ? window.paper.project.layers[0].children['logo'] : false
+    if (typeof width !== 'number') {
+      this.setState({
+        currentColor: this.skintones[Math.floor(Math.random() * this.skintones.length)]
+      })
+    }
 
     logo.children.map((segment) => {
       // Store old state, generate a new one
@@ -50,23 +60,11 @@ class App extends React.Component {
     paper.view.update()
   }
 
-  resizeSegment (segment, newWidth) {
-    let oldWidth = segment.strokeWidth
-
-    segment.onFrame = (event) => {
-      // If we're increasing in size
-      if (newWidth > oldWidth && segment.strokeWidth < newWidth) {
-        segment.strokeWidth *= 1.1
-      // If we're decreasing in size
-      } else if (newWidth < oldWidth && segment.strokeWidth > newWidth) {
-        segment.strokeWidth *= 0.9
-      } else if ((newWidth < oldWidth && segment.strokeWidth <= newWidth) ||
-        (newWidth > oldWidth && segment.strokeWidth >= newWidth)) {
-        // Stop animating once we're there
-        segment.strokeWidth = newWidth
-        segment.onFrame = () => {}
-      }
-    }
+  handleClick (segment, event) {
+    let clone = segment.firstCurve.path.split(segment.firstCurve.path.length * 0.5)
+    clone.strokeWidth = Math.random() * 50 + 3
+    clone.position.y -= 5
+    clone.position.x -= 5
   }
 
   componentWillMount () {
@@ -79,22 +77,10 @@ class App extends React.Component {
 
       // Bind mouse events
       logo.children.map((segment) => {
-        segment.on('mouseenter', (event) => {
-          segment.strokeCap = 'butt'
-          this.resizeSegment(segment, 3)
-        })
-        segment.on('mouseleave', (event) => {
-          this.resizeSegment(segment, Math.random() * 50 + 3)
-          segment.strokeCap = 'round'
-          segment.onFrame = () => {}
+        segment.on('click', (event) => {
+          this.handleClick(segment, event)
         })
       })
-
-      paper.view.onFrame = (event) => {
-        if (event.count % 50 === 0) {
-          this.regenerateSegments()
-        }
-      }
 
       // Give all segments a color and stroke width
       this.regenerateSegments()
@@ -102,7 +88,12 @@ class App extends React.Component {
   }
 
   render () {
-    return false
+    return (
+      <section>
+        <p><button onClick={this.regenerateSegments}>Regenerate</button></p>
+        <p><button onClick={this.resetLogo}>Strip</button></p>
+      </section>
+    )
   }
 }
 
