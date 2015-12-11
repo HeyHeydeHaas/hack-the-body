@@ -32,13 +32,16 @@ class App extends React.Component {
       spacing: 120,
       lineheight: 200,
       size: '',
-      editing: false
+      editing: false,
+      showOverlay: false
     }
 
     // Bind methods
     this.update = this.update.bind(this)
     this.setSize = this.setSize.bind(this)
     this.toggleEditing = this.toggleEditing.bind(this)
+    this.handleMouseEnter = this.handleMouseEnter.bind(this)
+    this.handleMouseLeave = this.handleMouseLeave.bind(this)
   }
 
   /**
@@ -77,6 +80,26 @@ class App extends React.Component {
   }
 
   /**
+   * Shows the overlay if not editing
+   */
+  handleMouseEnter () {
+    if (this.state.editing) return
+
+    this.setState({
+      showOverlay: true
+    })
+  }
+
+  /**
+   * Hides the overlay
+   */
+  handleMouseLeave () {
+    this.setState({
+      showOverlay: false
+    })
+  }
+
+  /**
    * Initializes the App
    */
   componentWillMount () {
@@ -98,6 +121,8 @@ class App extends React.Component {
     // Bind listeners
     window.addEventListener('resize', this.setSize)
     canvas.addEventListener('click', this.toggleEditing)
+    canvas.addEventListener('mouseenter', this.handleMouseEnter)
+    canvas.addEventListener('mouseleave', this.handleMouseLeave)
   }
 
   render () {
@@ -129,10 +154,12 @@ class App extends React.Component {
       background: this.state.backgroundColor
     }
 
+    let editOverlay = this.state.showOverlay ? <figure className='edit-overlay'>Edit</figure> : false
     let editorVisibility = this.state.editing ? 'show' : 'hide'
 
     return (
       <div>
+        {editOverlay}
         <figure className='backdrop' style={backdropStyle}></figure>
         <textarea className={editorVisibility} value={this.state.text} onChange={this.update} id='text' />
         {letters}

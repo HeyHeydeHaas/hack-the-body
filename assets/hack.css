@@ -35,9 +35,6 @@ figure.backdrop {
   height: 100vh;
   z-index: -1;
 }
-figure.edit-overlay {
-  display: none;
-}
 figure.logo-editor,
 textarea {
   float: left;
@@ -52,16 +49,13 @@ textarea {
   padding: 1em;
   background: rgba(245, 245, 245, 0.42);
 }
-figure.logo:hover figure.edit-overlay {
-  display: block;
+figure.edit-overlay {
   position: absolute;
+  top: 0;
   right: 0;
   color: #f0f0f0;
   background: rgba(0, 0, 0, 0.2);
   padding: 1em 2em;
-}
-figure.logo:hover {
-  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 article {
   padding: 1em 0;
