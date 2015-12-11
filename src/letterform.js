@@ -150,7 +150,7 @@ export default class LetterForm extends React.Component {
     let row = Math.floor(this.state.iterator / this.props.cols)
     if (col === 0) col = this.props.cols
 
-    letter.position.x = this.props.margin + this.props.spacing * (col - 0.5)
+    letter.position.x = this.props.spacing * (col - 0.5)
     letter.position.y = this.props.margin + this.props.lineheight * row
   }
 

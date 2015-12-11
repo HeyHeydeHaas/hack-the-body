@@ -2,8 +2,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import paper from 'paper/dist/paper-full'
+import LetterForm from './letterform'
 
 class App extends React.Component {
+  /**
+   * Initializes the component
+   */
   constructor (props) {
     super(props)
 
@@ -16,93 +20,124 @@ class App extends React.Component {
 
     // Set state
     this.state = {
-      currentColor: this.skintones[Math.floor(Math.random() * this.skintones.length)]
+      color: 0,
+      backgroundColor: 0,
+      text: 'Hack the  Body',
+      width: 0,
+      height: 0,
+      center: 0,
+      rows: 0,
+      cols: 0,
+      margin: 50,
+      spacing: 120,
+      lineheight: 200,
+      size: '',
+      editing: false
     }
 
     // Bind methods
-    this.resizeSegment = this.resizeSegment.bind(this)
-    this.regenerateSegments = this.regenerateSegments.bind(this)
+    this.update = this.update.bind(this)
+    this.setSize = this.setSize.bind(this)
+    this.toggleEditing = this.toggleEditing.bind(this)
   }
 
-  regenerateSegments (width) {
-    let logo = window.paper.project.layers[0] ? window.paper.project.layers[0].children['logo'] : false
-
-    logo.children.map((segment) => {
-      // Store old state, generate a new one
-      let oldWidth = segment.strokeWidth
-      let newWidth = typeof width === 'number' ? width : Math.random() * 50
-
-      // Set a color
-      segment.strokeColor = this.state.currentColor
-
-      // Animate until the values are correct
-      segment.onFrame = (event) => {
-        if (segment.strokeWidth > newWidth && oldWidth > newWidth) {
-          segment.strokeWidth *= 0.9
-        } else if (segment.strokeWidth < newWidth && oldWidth < newWidth) {
-          segment.strokeWidth *= 1.1
-        } else {
-          segment.strokeWidth = newWidth
-          segment.onFrame = () => {}
-        }
-      }
+  /**
+   * Universal update function that catches events from children
+   */
+  update (event) {
+    this.setState({
+      [event.target.id]: event.target.value,
+      unsavedChanges: true
     })
-    paper.view.update()
   }
 
-  resizeSegment (segment, newWidth) {
-    let oldWidth = segment.strokeWidth
+  /**
+   * Saves the size of the canvas to the state
+   */
+  setSize () {
+    let cols = Math.floor(paper.view.bounds.width / this.state.spacing)
+    let rows = Math.floor(paper.view.bounds.height / this.state.lineheight)
 
-    segment.onFrame = (event) => {
-      // If we're increasing in size
-      if (newWidth > oldWidth && segment.strokeWidth < newWidth) {
-        segment.strokeWidth *= 1.1
-      // If we're decreasing in size
-      } else if (newWidth < oldWidth && segment.strokeWidth > newWidth) {
-        segment.strokeWidth *= 0.9
-      } else if ((newWidth < oldWidth && segment.strokeWidth <= newWidth) ||
-        (newWidth > oldWidth && segment.strokeWidth >= newWidth)) {
-        // Stop animating once we're there
-        segment.strokeWidth = newWidth
-        segment.onFrame = () => {}
-      }
-    }
+    this.setState({
+      width: paper.view.bounds.width,
+      height: paper.view.bounds.height,
+      center: paper.view.center,
+      cols,
+      rows
+    })
   }
 
+  /**
+   * Toggles the state between editing and viewing
+   */
+  toggleEditing () {
+    this.setState({
+      editing: !this.state.editing
+    })
+  }
+
+  /**
+   * Initializes the App
+   */
   componentWillMount () {
+    // Set up Paper
     window.paper = paper.setup(canvas)
-    paper.project.importSVG('./assets/htb.svg', (logo) => {
-      // Place the logo 50px from the corner
-      logo.name = 'logo'
-      logo.pivot = logo.bounds.topLeft
-      logo.position = new paper.Point(50, 50)
 
-      // Bind mouse events
-      logo.children.map((segment) => {
-        segment.on('mouseenter', (event) => {
-          segment.strokeCap = 'butt'
-          this.resizeSegment(segment, 3)
-        })
-        segment.on('mouseleave', (event) => {
-          this.resizeSegment(segment, Math.random() * 50 + 3)
-          segment.strokeCap = 'round'
-          segment.onFrame = () => {}
-        })
-      })
+    // Set initial size
+    this.setSize()
 
-      paper.view.onFrame = (event) => {
-        if (event.count % 50 === 0) {
-          this.regenerateSegments()
-        }
-      }
+    // Set colors
+    let colorIndex = Math.floor(Math.random() * this.skintones.length)
+    let backgroundColorIndex = colorIndex - 1 < 0 ? this.skintones.length - 1 : colorIndex - 1
 
-      // Give all segments a color and stroke width
-      this.regenerateSegments()
+    this.setState({
+      color: this.skintones[colorIndex],
+      backgroundColor: this.skintones[backgroundColorIndex]
     })
+
+    // Bind listeners
+    window.addEventListener('resize', this.setSize)
+    canvas.addEventListener('click', this.toggleEditing)
   }
 
   render () {
-    return false
+    let letters = []
+
+    if (window.paper) {
+      let paper = window.paper
+
+      // Create elements for all letters
+      letters = Array.prototype.map.call(this.state.text, (char, index) => {
+        return <LetterForm
+                  char={char}
+                  fulltext={this.state.text}
+                  color={this.state.color}
+                  margin={this.state.margin}
+                  spacing={this.state.spacing}
+                  lineheight={this.state.lineheight}
+                  cols={this.state.cols}
+                  rows={this.state.rows}
+                  iterator={index}
+                  key={index} />
+      })
+
+      // Handle zooming
+      paper.view.update()
+    }
+
+    let backdropStyle = {
+      background: this.state.backgroundColor
+    }
+
+    let editorVisibility = this.state.editing ? 'show' : 'hide'
+
+    return (
+      <div>
+        <figure className='backdrop' style={backdropStyle}></figure>
+        <textarea className={editorVisibility} value={this.state.text} onChange={this.update} id='text' />
+        {letters}
+      </div>
+    )
   }
 }
 
