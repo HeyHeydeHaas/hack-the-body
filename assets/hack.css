@@ -125,3 +125,13 @@ button {
     max-height: 1000px;
     overflow: hidden;
 }
+@media screen and (max-width: 683px) {
+  canvas {
+    max-width: 300px;
+    max-height: 300px;
+  }
+  figure.logo-editor,
+  textarea {
+    width: 300px;
+  }
+}
