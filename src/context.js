@@ -13,46 +13,9 @@ class App extends React.Component {
 
     // Store skintones
     this.skintones = [
-      [
-        '#493357',
-        '#000000',
-        '#f0d1c8'
-      ],
-      [
-        '#f0d1c8',
-        '#a48278',
-        '#473b33'
-      ],
-      [
-        '#f0d1c8',
-        '#e6b3a4',
-        '#000000'
-      ],
-      [
-        '#ac6879',
-        '#f0d1c8',
-        '#503a21'
-      ],
-      [
-        '#934440',
-        '#dc8682',
-        '#ffffff'
-      ],
-      [
-        '#493357',
-        '#eaeaea',
-        '#9266ad'
-      ],
-      [
-        '#453a2d',
-        '#814e5b',
-        '#f4e6d0'
-      ],
-      [
-        '#b38d75',
-        '#f1cb9a',
-        '#453a2d'
-      ]
+      '#f0d1c8',
+      '#a48278',
+      '#473b33'
     ]
 
     // Set state
@@ -157,17 +120,12 @@ class App extends React.Component {
     this.setSize()
 
     // Set colors
-    let baseIndex = Math.floor(Math.random() * this.skintones.length)
-    let colorIndex = Math.floor(Math.random() * this.skintones[baseIndex].length)
-    let backgroundColorIndex = colorIndex - 1 < 0 ? this.skintones[baseIndex].length - 1 : colorIndex - 1
-    let textColorIndex = colorIndex - 2 < 0 ? this.skintones[baseIndex].length - 2 : colorIndex - 2
-    let background = this.skintones[baseIndex][backgroundColorIndex]
-    if (background === '#000000') background = '#333333'
+    let colorIndex = Math.floor(Math.random() * this.skintones.length)
+    let backgroundColorIndex = colorIndex - 1 < 0 ? this.skintones.length - 1 : colorIndex - 1
 
     this.setState({
-      color: this.skintones[baseIndex][colorIndex],
-      backgroundColor: background,
-      textColor: this.skintones[baseIndex][textColorIndex]
+      color: this.skintones[colorIndex],
+      backgroundColor: this.skintones[backgroundColorIndex]
     })
 
     // Bind listeners
