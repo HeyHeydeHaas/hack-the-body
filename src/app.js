@@ -118,7 +118,7 @@ class App extends React.Component {
    */
   setText (event) {
     this.setState({
-      text: event.target.innerText
+      text: event.target.textContent
     })
   }
 
