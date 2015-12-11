@@ -1,4 +1,4 @@
-/* global canvas, app */
+/* global canvas, app, editor */
 import React from 'react'
 import ReactDOM from 'react-dom'
 import paper from 'paper/dist/paper-full'
@@ -13,9 +13,9 @@ class App extends React.Component {
 
     // Store skintones
     this.skintones = [
-      '#f9da9d',
-      '#d8ae84',
-      '#664d3c'
+      '#f0d1c8',
+      '#a48278',
+      '#473b33'
     ]
 
     // Set state
@@ -39,7 +39,8 @@ class App extends React.Component {
     // Bind methods
     this.update = this.update.bind(this)
     this.setSize = this.setSize.bind(this)
-    this.toggleEditing = this.toggleEditing.bind(this)
+    this.openEditor = this.openEditor.bind(this)
+    this.toggleEditor = this.toggleEditor.bind(this)
     this.handleMouseEnter = this.handleMouseEnter.bind(this)
     this.handleMouseLeave = this.handleMouseLeave.bind(this)
   }
@@ -71,9 +72,18 @@ class App extends React.Component {
   }
 
   /**
+   * Opens the editor
+   */
+  openEditor () {
+    this.setState({
+      editing: true
+    })
+  }
+
+  /**
    * Toggles the state between editing and viewing
    */
-  toggleEditing () {
+  toggleEditor () {
     this.setState({
       editing: !this.state.editing
     })
@@ -120,9 +130,9 @@ class App extends React.Component {
 
     // Bind listeners
     window.addEventListener('resize', this.setSize)
-    canvas.addEventListener('click', this.toggleEditing)
-    canvas.addEventListener('mouseenter', this.handleMouseEnter)
-    canvas.addEventListener('mouseleave', this.handleMouseLeave)
+    canvas.addEventListener('click', this.openEditor)
+    editor.addEventListener('mouseenter', this.handleMouseEnter)
+    editor.addEventListener('mouseleave', this.handleMouseLeave)
   }
 
   render () {
@@ -142,6 +152,7 @@ class App extends React.Component {
                   lineheight={this.state.lineheight}
                   cols={this.state.cols}
                   rows={this.state.rows}
+                  editing={this.state.editing}
                   iterator={index}
                   key={index} />
       })
@@ -154,8 +165,10 @@ class App extends React.Component {
       background: this.state.backgroundColor
     }
 
-    let editOverlay = this.state.showOverlay ? <figure className='edit-overlay'>Edit</figure> : false
     let editorVisibility = this.state.editing ? 'show' : 'hide'
+    let overlayLabel = this.state.editing ? 'Close' : 'Edit'
+    let editOverlay = this.state.showOverlay || this.state.editing
+      ? <figure className='edit-overlay' onClick={this.toggleEditor}>{overlayLabel}</figure> : false
 
     return (
       <div>

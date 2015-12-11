@@ -56,6 +56,7 @@ figure.edit-overlay {
   color: #f0f0f0;
   background: rgba(0, 0, 0, 0.2);
   padding: 1em 2em;
+  cursor: pointer;
 }
 article {
   padding: 1em 0;

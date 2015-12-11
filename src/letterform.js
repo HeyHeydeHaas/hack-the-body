@@ -100,7 +100,7 @@ export default class LetterForm extends React.Component {
           this.handleClick(segment, event)
         })
         segment.on('mouseenter', (event) => {
-          segment.opacity = 0.8
+          if(this.props.editing) segment.opacity = 0.8
         })
         segment.on('mouseleave', (event) => {
           segment.opacity = 1
