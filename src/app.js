@@ -176,11 +176,11 @@ class App extends React.Component {
    * Hides the overlay
    */
   handleMouseLeave (event) {
-    if (event.toElement.className !== 'edit-overlay') {
+    //if (event.toElement && event.toElement.className !== 'edit-overlay') {
       this.setState({
         showOverlay: false
       })
-    }
+    //}
   }
 
   /**
@@ -201,7 +201,6 @@ class App extends React.Component {
     canvas.addEventListener('click', this.openEditor)
     canvas.addEventListener('mouseenter', this.handleMouseEnter)
     canvas.addEventListener('mouseleave', this.handleMouseLeave)
-    editor.addEventListener('mouseleave', this.handleMouseLeave)
 
     // Load data
     reqwest('./projects.json', (projects) => {
@@ -253,8 +252,11 @@ class App extends React.Component {
 
     let editorVisibility = this.state.editing ? 'show' : 'hide'
     let overlayLabel = this.state.editing ? 'Close' : 'Edit'
+    let overlayStyle = this.state.editing ? {
+      zIndex: 100
+    } : {}
     let editOverlay = this.state.showOverlay || this.state.editing
-      ? <figure className='edit-overlay' onClick={this.toggleEditor}>{overlayLabel}</figure> : false
+      ? <figure className='edit-overlay' style={overlayStyle} onClick={this.toggleEditor}>{overlayLabel}</figure> : false
     let projects = this.state.projects.map((project, index) => {
       return <li key={index} onClick={this.setText}>{project}</li>
     })
