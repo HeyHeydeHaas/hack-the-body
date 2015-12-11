@@ -11,9 +11,9 @@ body {
 }
 a,
 a:hover {
-  color: #f0f0f0;
+  color: inherit;
   text-decoration: none;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 2px solid #666;
 }
 p {
   margin: 0 0 2em;
@@ -27,6 +27,9 @@ canvas {
   width: 100%;
   height: 600px;
 }
+canvas:hover {
+  background: rgba(0, 255, 255, 0.03);
+}
 figure.backdrop {
   position: fixed;
   top: 0;
@@ -34,6 +37,9 @@ figure.backdrop {
   width: 100%;
   height: 100vh;
   z-index: -1;
+}
+figure.logo-editor {
+  position: fixed;
 }
 figure.logo-editor,
 textarea {
@@ -47,7 +53,7 @@ textarea {
   font-size: 1.5em;
   border: 2px solid #ccc;
   padding: 1em;
-  background: rgba(245, 245, 245, 0.42);
+  background: rgba(245, 245, 245, 0.22);
 }
 figure.edit-overlay {
   position: absolute;
@@ -64,8 +70,16 @@ article {
   float: left;
   width: 20em;
 }
+article ul {
+  list-style: none;
+}
 time {
   font-style: italic;
+  font-size: 0.6em;
+}
+p.lead {
+  font-size: 2.5em;
+  line-height: 1.21;
 }
 button {
   background: #101010;

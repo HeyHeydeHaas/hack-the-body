@@ -1,8 +1,7 @@
-/* global canvas, app, overlay */
+/* global canvas, app, editor */
 import React from 'react'
 import ReactDOM from 'react-dom'
 import paper from 'paper/dist/paper-full'
-import reqwest from 'reqwest'
 import LetterForm from './letterform'
 
 class App extends React.Component {
@@ -71,14 +70,12 @@ class App extends React.Component {
       lineheight: 200,
       size: '',
       editing: false,
-      showOverlay: false,
-      projects: []
+      showOverlay: false
     }
 
     // Bind methods
     this.update = this.update.bind(this)
     this.setSize = this.setSize.bind(this)
-    this.setText = this.setText.bind(this)
     this.setColors = this.setColors.bind(this)
     this.openEditor = this.openEditor.bind(this)
     this.toggleEditor = this.toggleEditor.bind(this)
@@ -113,25 +110,21 @@ class App extends React.Component {
   }
 
   /**
-   * Sets the text to the project that was clicked
-   */
-  setText (event) {
-    this.setState({
-      text: event.target.innerText
-    })
-  }
-
-  /**
    * Sets the current color scheme
    */
   setColors () {
     // Set colors
     let baseIndex = Math.floor(Math.random() * this.skintones.length)
+    let colorIndex = Math.floor(Math.random() * this.skintones[baseIndex].length)
+    let backgroundColorIndex = colorIndex - 1 < 0 ? this.skintones[baseIndex].length - 1 : colorIndex - 1
+    let textColorIndex = colorIndex - 2 < 0 ? this.skintones[baseIndex].length - 2 : colorIndex - 2
+    let background = this.skintones[baseIndex][backgroundColorIndex]
+    if (background === '#000000') background = '#333333'
 
     this.setState({
-      color: this.skintones[baseIndex][0],
-      backgroundColor: this.skintones[baseIndex][1],
-      textColor: this.skintones[baseIndex][2]
+      color: this.skintones[baseIndex][colorIndex],
+      backgroundColor: background,
+      textColor: this.skintones[baseIndex][textColorIndex]
     })
   }
 
@@ -156,7 +149,7 @@ class App extends React.Component {
   /**
    * Shows the overlay if not editing
    */
-  handleMouseEnter (event) {
+  handleMouseEnter () {
     if (this.state.editing) return
 
     this.setState({
@@ -167,18 +160,16 @@ class App extends React.Component {
   /**
    * Hides the overlay
    */
-  handleMouseLeave (event) {
-    if (event.toElement.className !== 'edit-overlay') {
-      this.setState({
-        showOverlay: false
-      })
-    }
+  handleMouseLeave () {
+    this.setState({
+      showOverlay: false
+    })
   }
 
   /**
    * Initializes the App
    */
-  componentDidMount () {
+  componentWillMount () {
     // Set up Paper
     window.paper = paper.setup(canvas)
 
@@ -191,13 +182,8 @@ class App extends React.Component {
     // Bind listeners
     window.addEventListener('resize', this.setSize)
     canvas.addEventListener('click', this.openEditor)
-    canvas.addEventListener('mouseenter', this.handleMouseEnter)
-    canvas.addEventListener('mouseleave', this.handleMouseLeave)
-
-    // Load data
-    reqwest('./projects.json', (projects) => {
-      this.setState({projects})
-    })
+    editor.addEventListener('mouseenter', this.handleMouseEnter)
+    editor.addEventListener('mouseleave', this.handleMouseLeave)
   }
 
   render () {
@@ -234,41 +220,15 @@ class App extends React.Component {
     let overlayLabel = this.state.editing ? 'Close' : 'Edit'
     let editOverlay = this.state.showOverlay || this.state.editing
       ? <figure className='edit-overlay' onClick={this.toggleEditor}>{overlayLabel}</figure> : false
-    let projects = this.state.projects.map((project, index) => {
-      return <li key={index} onClick={this.setText}>{project}</li>
-    })
 
     return (
-    <div>
-      <style>{`
-        body {
-          color: ${this.state.textColor}
-        }
-      `}</style>
-
-      <figure className='logo-editor' id='editor'>
-        <figure className='logo'>
-          <canvas id='canvas' data-paper-resize='true'></canvas>
-        </figure>
-        <div>
-          {editOverlay}
-          <figure className='backdrop' style={backdropStyle}></figure>
-          <textarea className={editorVisibility} value={this.state.text} onChange={this.update} id='text' />
-          {letters}
-        </div>
-      </figure>
-
-      <article>
-        <time>Fri 11 Dec 13:55 &middot; <a href='./'>Back to the list</a></time>
-        <p className='lead'>
-          A program on the intersection of art, science technology and society
-        </p>
-        <h3>Projects</h3>
-        <ul>
-          {projects}
-        </ul>
-      </article>
-    </div>
+      <div>
+        {editOverlay}
+        <figure className='backdrop' style={backdropStyle}></figure>
+        <textarea className={editorVisibility} value={this.state.text} onChange={this.update} id='text' />
+        <button onClick={this.setColors}>Change color scheme</button>
+        {letters}
+      </div>
     )
   }
 }

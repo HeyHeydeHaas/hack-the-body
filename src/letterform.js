@@ -135,7 +135,11 @@ export default class LetterForm extends React.Component {
    * Updates if there is a new letter
    */
   componentWillReceiveProps (nextProps) {
-    if (nextProps.char !== this.props.char || nextProps.iterator !== this.props.iterator) {
+    if (
+      nextProps.char !== this.props.char ||
+      nextProps.iterator !== this.props.iterator ||
+      nextProps.color !== this.props.color
+    ) {
       this.componentWillUnmount()
       this.importLetter(nextProps.char)
     }
