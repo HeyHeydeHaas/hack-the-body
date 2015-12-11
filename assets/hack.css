@@ -38,9 +38,6 @@ figure.backdrop {
   height: 100vh;
   z-index: -1;
 }
-figure.logo-editor {
-  position: fixed;
-}
 figure.logo-editor,
 textarea {
   float: left;

@@ -1,4 +1,4 @@
-/* global canvas, app, overlay */
+/* global canvas, app, overlay, editor */
 import React from 'react'
 import ReactDOM from 'react-dom'
 import paper from 'paper/dist/paper-full'
@@ -102,13 +102,21 @@ class App extends React.Component {
   setSize () {
     let cols = Math.floor(paper.view.bounds.width / this.state.spacing)
     let rows = Math.floor(paper.view.bounds.height / this.state.lineheight)
+    let margin = this.state.margin
+
+    if (cols < 5) {
+      paper.view.zoom = 0.7
+    } else {
+      paper.view.zoom = 1
+    }
 
     this.setState({
       width: paper.view.bounds.width,
       height: paper.view.bounds.height,
       center: paper.view.center,
       cols,
-      rows
+      rows,
+      margin
     })
   }
 
@@ -193,6 +201,7 @@ class App extends React.Component {
     canvas.addEventListener('click', this.openEditor)
     canvas.addEventListener('mouseenter', this.handleMouseEnter)
     canvas.addEventListener('mouseleave', this.handleMouseLeave)
+    editor.addEventListener('mouseleave', this.handleMouseLeave)
 
     // Load data
     reqwest('./projects.json', (projects) => {
@@ -222,6 +231,18 @@ class App extends React.Component {
                   key={index} />
       })
 
+      // Add responsive query
+      var responsive = `
+      @media screen and (max-width: 683px) {
+        canvas {
+          height: 300px;
+        }
+        figure.logo-editor,
+        textarea {
+          width: 300px;
+        }
+      }`
+
       // Handle zooming
       paper.view.update()
     }
@@ -244,11 +265,11 @@ class App extends React.Component {
         body {
           color: ${this.state.textColor}
         }
-      `}</style>
+      ` + responsive}</style>
 
       <figure className='logo-editor' id='editor'>
         <figure className='logo'>
-          <canvas id='canvas' data-paper-resize='true'></canvas>
+          <canvas id='canvas'></canvas>
         </figure>
         <div>
           {editOverlay}
