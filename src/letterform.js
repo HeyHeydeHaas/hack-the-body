@@ -26,27 +26,29 @@ export default class LetterForm extends React.Component {
   regenerateSegments (width) {
     let letter = window.paper.project.layers[0] ? window.paper.project.layers[0].children[this.state.name] : false
 
-    letter.children.map((segment) => {
-      // Store old state, generate a new one
-      let oldWidth = segment.strokeWidth
-      let newWidth = typeof width === 'number' ? width : Math.random() * 50 + 3
+    if (letter) {
+      letter.children.map((segment) => {
+        // Store old state, generate a new one
+        let oldWidth = segment.strokeWidth
+        let newWidth = typeof width === 'number' ? width : Math.random() * this.props.factor + 3
 
-      // Set a color
-      segment.strokeColor = this.props.color
+        // Set a color
+        segment.strokeColor = this.props.color
 
-      // Animate until the values are correct
-      segment.onFrame = (event) => {
-        if (segment.strokeWidth > newWidth && oldWidth > newWidth) {
-          segment.strokeWidth *= 0.9
-        } else if (segment.strokeWidth < newWidth && oldWidth < newWidth) {
-          segment.strokeWidth *= 1.1
-        } else {
-          segment.strokeWidth = newWidth
-          segment.onFrame = () => {}
+        // Animate until the values are correct
+        segment.onFrame = (event) => {
+          if (segment.strokeWidth > newWidth && oldWidth > newWidth) {
+            segment.strokeWidth *= 0.9
+          } else if (segment.strokeWidth < newWidth && oldWidth < newWidth) {
+            segment.strokeWidth *= 1.1
+          } else {
+            segment.strokeWidth = newWidth
+            segment.onFrame = () => {}
+          }
         }
-      }
-    })
-    paper.view.update()
+      })
+      paper.view.update()
+    }
   }
 
   handleClick (segment, event) {
@@ -146,6 +148,8 @@ export default class LetterForm extends React.Component {
     ) {
       this.componentWillUnmount()
       this.importLetter(nextProps.char)
+    } else if (nextProps.step !== this.props.step && nextProps.step > 0) {
+      this.regenerateSegments()
     }
   }
 

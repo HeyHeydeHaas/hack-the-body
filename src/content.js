@@ -1,4 +1,4 @@
-/* global canvas, app, editor */
+/* global canvas, app */
 import React from 'react'
 import ReactDOM from 'react-dom'
 import paper from 'paper/dist/paper-full'
@@ -69,16 +69,21 @@ class App extends React.Component {
       margin: 50,
       spacing: 120,
       lineheight: 200,
-      factor: 20,
-      step: 0
+      size: '',
+      editing: false,
+      showOverlay: false,
+      projects: []
     }
 
     // Bind methods
     this.update = this.update.bind(this)
     this.setSize = this.setSize.bind(this)
+    this.setText = this.setText.bind(this)
     this.setColors = this.setColors.bind(this)
-    this.toggleFullscreen = this.toggleFullscreen.bind(this)
-    this.regenerateSegments = this.regenerateSegments.bind(this)
+    this.openEditor = this.openEditor.bind(this)
+    this.toggleEditor = this.toggleEditor.bind(this)
+    this.handleMouseEnter = this.handleMouseEnter.bind(this)
+    this.handleMouseLeave = this.handleMouseLeave.bind(this)
   }
 
   /**
@@ -86,7 +91,8 @@ class App extends React.Component {
    */
   update (event) {
     this.setState({
-      [event.target.id]: event.target.value
+      [event.target.id]: event.target.value,
+      unsavedChanges: true
     })
   }
 
@@ -108,6 +114,15 @@ class App extends React.Component {
   }
 
   /**
+   * Sets the text to the project that was clicked
+   */
+  setText (event) {
+    this.setState({
+      text: event.target.textContent
+    })
+  }
+
+  /**
    * Sets the current color scheme
    */
   setColors () {
@@ -122,21 +137,40 @@ class App extends React.Component {
   }
 
   /**
-   * Toggles the window between fullscreen and windowed
+   * Opens the editor
    */
-  toggleFullscreen () {
-    var rfs = editor.requestFullScreen ||
-              editor.webkitRequestFullScreen ||
-              editor.mozRequestFullScreen
-    rfs.call(editor)
+  openEditor () {
+    this.setState({
+      editing: true
+    })
   }
 
   /**
-   * Increases the step count, forcing a rerender for all letters
+   * Toggles the state between editing and viewing
    */
-  regenerateSegments () {
+  toggleEditor () {
     this.setState({
-      step: this.state.step + 1
+      editing: !this.state.editing
+    })
+  }
+
+  /**
+   * Shows the overlay if not editing
+   */
+  handleMouseEnter (event) {
+    if (this.state.editing) return
+
+    this.setState({
+      showOverlay: true
+    })
+  }
+
+  /**
+   * Hides the overlay
+   */
+  handleMouseLeave (event) {
+    this.setState({
+      showOverlay: false
     })
   }
 
@@ -153,21 +187,16 @@ class App extends React.Component {
     // Set color scheme
     this.setColors()
 
-    // Load data
-    setInterval(() => {
-      reqwest('./visitors.json', (data) => {
-        let factor = data.visitors * 3
-        this.setState({factor})
-      })
-    })
-
     // Bind listeners
     window.addEventListener('resize', this.setSize)
-    paper.view.onFrame = (event) => {
-      if (event.count % 50 === 0) {
-        this.regenerateSegments()
-      }
-    }
+    canvas.addEventListener('click', this.openEditor)
+    canvas.addEventListener('mouseenter', this.handleMouseEnter)
+    canvas.addEventListener('mouseleave', this.handleMouseLeave)
+
+    // Load data
+    reqwest('./projects.json', (projects) => {
+      this.setState({projects})
+    })
   }
 
   render () {
@@ -188,8 +217,6 @@ class App extends React.Component {
                   cols={this.state.cols}
                   rows={this.state.rows}
                   editing={this.state.editing}
-                  step={this.state.step}
-                  factor={this.state.factor}
                   iterator={index}
                   key={index} />
       })
@@ -201,6 +228,17 @@ class App extends React.Component {
     let backdropStyle = {
       background: this.state.backgroundColor
     }
+
+    let editorVisibility = this.state.editing ? 'show' : 'hide'
+    let overlayLabel = this.state.editing ? 'Close' : 'Edit'
+    let overlayStyle = this.state.editing ? {
+      zIndex: 100
+    } : {}
+    let editOverlay = this.state.showOverlay || this.state.editing
+      ? <figure className='edit-overlay' style={overlayStyle} onClick={this.toggleEditor}>{overlayLabel}</figure> : false
+    let projects = this.state.projects.map((project, index) => {
+      return <li key={index} onClick={this.setText}>{project}</li>
+    })
 
     return (
     <div>
@@ -215,11 +253,23 @@ class App extends React.Component {
           <canvas id='canvas'></canvas>
         </figure>
         <div>
+          {editOverlay}
           <figure className='backdrop' style={backdropStyle}></figure>
-          <button className='fullscreen-button' onClick={this.toggleFullscreen}>Fullscreen</button>
+          <textarea className={editorVisibility} value={this.state.text} onChange={this.update} id='text' />
           {letters}
         </div>
       </figure>
+
+      <article>
+        <time>Fri 11 Dec 13:55 &middot; <a href='./'>Back to the list</a></time>
+        <p className='lead'>
+          A program on the intersection of art, science technology and society
+        </p>
+        <h3>Projects</h3>
+        <ul>
+          {projects}
+        </ul>
+      </article>
     </div>
     )
   }
