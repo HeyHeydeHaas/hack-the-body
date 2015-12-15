@@ -105,6 +105,10 @@ export default class LetterForm extends React.Component {
         segment.on('mouseleave', (event) => {
           segment.opacity = 1
         })
+        segment.on('mousedrag', (event) => {
+          segment.position.x += event.delta.x
+          segment.position.y += event.delta.y
+        })
       })
 
       // Give all segments a color and stroke width
