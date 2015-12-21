@@ -72,7 +72,7 @@ class App extends React.Component {
       size: '',
       editing: false,
       showOverlay: false,
-      factor: 35,
+      factor: 50,
       projects: []
     }
 
@@ -219,7 +219,7 @@ class App extends React.Component {
                   rows={this.state.rows}
                   editing={this.state.editing}
                   factor={this.state.factor}
-                  variant='mono-split'
+                  variant='mono'
                   iterator={index}
                   key={index} />
       })
@@ -264,16 +264,13 @@ class App extends React.Component {
       </figure>
 
       <article>
-        <time>Wed 16 Dec 13:05 &middot; <a href='./'>Back to the list</a></time>
+        <time>Wed 16 Dec 11:15 &middot; <a href='./'>Back to the list</a></time>
         <p className='lead'>
-          And of course, here is the variant with split up segments
+          Here is the same title but with a monospace typeface
         </p>
-        <p>
-        I thought it would be nice to include both variants here to see
-        how the segments were split and effect they really have. This one
-        also has a thickness factor of 35 instead of 50, making the letters
-        bleed a little less into each other.
-        </p>
+        <p>I created Line Sans Mono, based off Line Sans, by imitating the proportions of
+        the Nitti typeface. Since the canvas is divided into a fixed grid, dynamic
+        spacing is not an option, which is why a monospace is more suitable.</p>
         <h3>Projects</h3>
         <ul>
           {projects}
