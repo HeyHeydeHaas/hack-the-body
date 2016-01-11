@@ -8,12 +8,12 @@ var source        = require('vinyl-source-stream')
 var buffer        = require('vinyl-buffer')
 
 function compile(watch) {
-  var bundler = watchify(browserify('./src/logo.js', { debug: true }).transform(babel))
+  var bundler = watchify(browserify('./src/editor.js', { debug: true }).transform(babel))
 
   function rebundle() {
     bundler.bundle()
       .on('error', function(err) { console.error(err) ; this.emit('end') })
-      .pipe(source('logo.js'))
+      .pipe(source('editor.js'))
       .pipe(buffer())
       .pipe(uglify())
       .pipe(sourcemaps.init({ loadMaps: true }))
