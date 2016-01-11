@@ -24,25 +24,27 @@ p.lead {
   line-height: 1.21;
 }
 main {
-  width: 80%;
+  width: 60%;
   max-width: 1200px;
   margin: 3em auto;
 }
 canvas {
   width: 100%;
-  min-height: 600px;
+  min-height: 700px;
   cursor: move;
 }
 figure.logo {
   float: left;
-  width: 600px;
-  margin-right: 1em;
-  position: relative;
+  width: 700px;
+  position: fixed;
+  left: 20vw;
+  margin-left: -175px;
+  z-index: -1;
 }
 article {
   padding: 1em 0;
-  margin: 2em 0;
-  float: left;
+  margin: 2em 5em;
+  float: right;
   width: 20em;
 }
 article ul {

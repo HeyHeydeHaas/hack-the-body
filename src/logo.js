@@ -24,12 +24,12 @@ export default class Logo extends React.Component {
   }
 
   /**
-   * Forces the viewSize to be 600x600, for a scalable canvas
+   * Forces the viewSize to be 700x700, for a scalable canvas
    */
   setSize () {
     paper.view.viewSize = {
-      width: 600,
-      height: 600
+      width: 700,
+      height: 700
     }
   }
 
@@ -93,8 +93,8 @@ export default class Logo extends React.Component {
       logoVector.children.map((segment) => {
         segment.on('mousedrag', (event) => {
           if (
-            segment.position.x + event.delta.x > 0 && segment.position.x + event.delta.x < 600 &&
-            segment.position.y + event.delta.y > 0 && segment.position.y + event.delta.y < 600
+            segment.position.x + event.delta.x > 0 && segment.position.x + event.delta.x < 700 &&
+            segment.position.y + event.delta.y > 0 && segment.position.y + event.delta.y < 700
           ) {
             segment.position.x += event.delta.x
             segment.position.y += event.delta.y
