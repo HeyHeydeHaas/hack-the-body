@@ -2,7 +2,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import paper from 'paper/dist/paper-full'
-import LetterForm from './letterform'
 
 export default class Logo extends React.Component {
   /**
@@ -14,114 +13,107 @@ export default class Logo extends React.Component {
     // Set state
     this.state = {
       color: logo.dataset.color || 0,
-      text: logo.dataset.text || 'Hack the  Body',
-      variant: logo.dataset.variant || 'mono-split',
-      width: 0,
-      height: 0,
-      center: 0,
-      rows: 0,
-      cols: 0,
-      margin: 50,
-      spacing: 120,
-      lineheight: 150,
-      factor: 35,
-      step: 0
+      variant: logo.dataset.variant || 'htb',
+      factor: logo.dataset.factor || 50,
+      margin: logo.dataset.margin || 50
     }
 
     // Bind methods
-    this.update = this.update.bind(this)
     this.setSize = this.setSize.bind(this)
     this.regenerateSegments = this.regenerateSegments.bind(this)
   }
 
   /**
-   * Universal update function that catches events from children
-   */
-  update (event) {
-    this.setState({
-      [event.target.id]: event.target.value
-    })
-  }
-
-  /**
-   * Saves the size of the logo to the state
+   * Forces the viewSize to be 600x600, for a scalable canvas
    */
   setSize () {
     paper.view.viewSize = {
       width: 600,
       height: 600
     }
-    this.setState({
-      width: paper.view.bounds.width,
-      height: paper.view.bounds.height,
-      center: paper.view.center,
-      cols: 5,
-      rows: 5
-    })
   }
 
   /**
-   * Increases the step count, forcing a rerender for all letters
+   * Sets a new random width for all segments
    */
-  regenerateSegments () {
-    this.setState({
-      step: this.state.step + 1
-    })
-  }
+   regenerateSegments (width) {
+     let logo = window.paper.project.layers[0] ? window.paper.project.layers[0].children['logoVector'] : false
+
+     if (logo) {
+       logo.children.map((segment) => {
+         // Store old state, generate a new one
+         let oldWidth = segment.strokeWidth
+         let newWidth = typeof width === 'number' ? width : Math.random() * this.state.factor
+
+         // Set a color
+         segment.strokeColor = this.state.color
+
+         // Animate until the values are correct
+         segment.onFrame = (event) => {
+           if (segment.strokeWidth > newWidth && oldWidth > newWidth) {
+             segment.strokeWidth *= 0.9
+           } else if (segment.strokeWidth < newWidth && oldWidth < newWidth) {
+             segment.strokeWidth *= 1.1
+           } else {
+             segment.strokeWidth = newWidth
+             segment.onFrame = () => {}
+           }
+         }
+       })
+       paper.view.update()
+     }
+   }
 
   /**
    * Initializes the component
    */
-  componentDidMount () {
+  componentWillMount () {
     // Set up Paper
     window.paper = paper.setup(logo)
-
-    // Set initial size
-    this.setSize()
 
     // Bind listeners
     window.addEventListener('resize', this.setSize)
     paper.view.onFrame = (event) => {
-      if (event.count % 50 === 0) {
+      if (event.count % 100 === 0) {
         this.regenerateSegments()
       }
     }
-  }
 
-  render () {
-    let letters = []
+    // Import the SVG file
+    let path = './assets/' + this.state.variant + '.svg'
 
-    if (window.paper) {
-      let paper = window.paper
+    paper.project.importSVG(path, (logoVector) => {
+      // Place the logo vector
+      logoVector.name = 'logoVector'
+      logoVector.pivot = logoVector.bounds.topLeft
+      logoVector.position.x = this.state.margin
+      logoVector.position.y = this.state.margin
 
-      // Create elements for all letters
-      letters = Array.prototype.map.call(this.state.text, (char, index) => {
-        return <LetterForm
-                  char={char}
-                  fulltext={this.state.text}
-                  color={this.state.color}
-                  margin={this.state.margin}
-                  spacing={this.state.spacing}
-                  lineheight={this.state.lineheight}
-                  cols={this.state.cols}
-                  rows={this.state.rows}
-                  editing={this.state.editing}
-                  factor={this.state.factor}
-                  step={this.state.step}
-                  variant={this.state.variant}
-                  iterator={index}
-                  key={index} />
+      // Bind mouse events
+      logoVector.children.map((segment) => {
+        segment.on('mousedrag', (event) => {
+          if (
+            segment.position.x + event.delta.x > 0 && segment.position.x + event.delta.x < 600 &&
+            segment.position.y + event.delta.y > 0 && segment.position.y + event.delta.y < 600
+          ) {
+            segment.position.x += event.delta.x
+            segment.position.y += event.delta.y
+          }
+        })
       })
 
-      // Handle zooming
-      paper.view.update()
-    }
+      // Give all segments a color and stroke width
+      this.regenerateSegments()
 
-    return (
-      <figure>
-        {letters}
-      </figure>
-    )
+      // Update the view
+      paper.view.update()
+    })
+  }
+
+  // No DOM element is returned, since Paper handles the actual rendering
+  render () {
+    this.setSize()
+    return false
   }
 }
 

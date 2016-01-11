@@ -16,11 +16,12 @@
             how and where you put it on the page
 
             Options (none required):
-            data-text      The text to be displayed
             data-color     The color to use for the segments
-            data-variant   The folder with all SVG files, as in ./assets/letters-[variant]
+            data-variant   The file to use, basically amounts to ./assets/[variant].svg
+            data-factor    The maximum line width, defaults to 50
+            data-margin    The inner margin of the canvas
           -->
-          <canvas id="logo" data-text="Hack the  Body" data-color="#f9bbb4" data-variant="mono-split" ></canvas>
+          <canvas id="logo" data-color="#f9bbb4" data-factor="70" data-variant="htb" data-paper-resize="true"></canvas>
       </figure>
 
       <article>
@@ -32,24 +33,14 @@
 
         <p>
           All segments animate by themselves, but their position can be adjusted. The typing
-          functionality is gone, but the figure is still generated from actual text rather
-          than from a pre-defined complete logotype.
+          functionality is gone, the logo is generated from a single SVG file instead.
         </p>
 
         <p>
-          If you&rsquo;re interested in seeing how this works, check out the unminified source:
-          <ul>
-            <li>
-              <a target="_blank" href="https://github.com/accommodavid/hack-the-body/blob/gh-pages/src/logo.js">
-                Logo.js
-              </a>
-            </li>
-            <li>
-              <a target="_blank" href="https://github.com/accommodavid/hack-the-body/blob/gh-pages/src/letterform.js">
-                LetterForm.js
-              </a>
-            </li>
-          </ul>
+          If you&rsquo;re interested in seeing how this works, check out the
+          <a target="_blank" href="https://github.com/accommodavid/hack-the-body/blob/gh-pages/src/logo.js">
+            unminified source
+          </a>.
         </p>
       </article>
     </div>
