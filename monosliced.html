@@ -9,6 +9,19 @@
 <body>
   <main id="app"></main>
 
+  <form action="http://io.accommodavid.sexy/echo" method="post" id="downloadForm">
+    <input type="hidden" name="filename" value="hack.svg">
+    <input type="hidden" name="type" value="image/svg+xml">
+    <input type="hidden" name="content" id="formContent">
+    <button onclick="download()">Download</button>
+  </form>
+
   <script src="dist/monosliced.js"></script>
+  <script>
+    var download = function () {
+      formContent.innerHTML = window.paper.project.exportSVG()
+      downloadForm.submit()
+    }
+  </script>
 </body>
 </html>
