@@ -13,14 +13,8 @@ export default class LetterForm extends React.Component {
 
     // Bind methods
     this.place = this.place.bind(this)
-    this.resetLogo = this.resetLogo.bind(this)
-    this.handleClick = this.handleClick.bind(this)
     this.importLetter = this.importLetter.bind(this)
     this.regenerateSegments = this.regenerateSegments.bind(this)
-  }
-
-  resetLogo () {
-    this.regenerateSegments(10)
   }
 
   regenerateSegments (width) {
@@ -51,34 +45,6 @@ export default class LetterForm extends React.Component {
     }
   }
 
-  handleClick (segment, event) {
-    this.randomizeSegment(segment, false)
-  }
-
-  randomizeSegment (segment, loop) {
-    let oldWidth = segment.strokeWidth
-    let newWidth = Math.random() * 50 + 3
-
-    segment.onFrame = (event) => {
-      // If we're increasing in size
-      if (newWidth > oldWidth && segment.strokeWidth < newWidth) {
-        segment.strokeWidth *= 1.1
-      // If we're decreasing in size
-      } else if (newWidth < oldWidth && segment.strokeWidth > newWidth) {
-        segment.strokeWidth *= 0.9
-      } else if ((newWidth < oldWidth && segment.strokeWidth <= newWidth) ||
-        (newWidth > oldWidth && segment.strokeWidth >= newWidth)) {
-        // If we want to loop, just pick a new random value
-        if (loop) {
-          newWidth = Math.random() * 50 + 3
-        // Otherwise, unbind this function
-        } else {
-          segment.onFrame = () => {}
-        }
-      }
-    }
-  }
-
   /**
    * Imports the letter and generates widths for each segment
    */
@@ -99,15 +65,6 @@ export default class LetterForm extends React.Component {
 
       // Bind mouse events
       letter.children.map((segment) => {
-        segment.on('click', (event) => {
-          this.handleClick(segment, event)
-        })
-        segment.on('mouseenter', (event) => {
-          if(this.props.editing) segment.opacity = 0.8
-        })
-        segment.on('mouseleave', (event) => {
-          segment.opacity = 1
-        })
         segment.on('mousedrag', (event) => {
           segment.position.x += event.delta.x
           segment.position.y += event.delta.y
