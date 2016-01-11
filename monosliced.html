@@ -19,7 +19,7 @@
   <script src="dist/monosliced.js"></script>
   <script>
     var download = function () {
-      formContent.innerHTML = window.paper.project.exportSVG()
+      formContent.value = window.paper.project.exportSVG()
       downloadForm.submit()
     }
   </script>
