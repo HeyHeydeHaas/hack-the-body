@@ -15,7 +15,8 @@ export default class Logo extends React.Component {
       color: logo.dataset.color || 0,
       variant: logo.dataset.variant || 'htb',
       factor: logo.dataset.factor || 50,
-      margin: logo.dataset.margin || 50
+      margin: logo.dataset.margin || 50,
+      percentage: logo.dataset.percentage / 100 || 1
     }
 
     // Bind methods
@@ -24,13 +25,16 @@ export default class Logo extends React.Component {
   }
 
   /**
-   * Forces the viewSize to be 700x700, for a scalable canvas
+   * Forces the viewSize to be 1500x1500, for a scalable canvas
    */
   setSize () {
+    let newLength = window.innerWidth * this.state.percentage
     paper.view.viewSize = {
-      width: 700,
-      height: 700
+      width: newLength,
+      height: newLength
     }
+    paper.view.zoom = newLength / 1500
+    paper.view.center = (0, 0)
   }
 
   /**
@@ -85,7 +89,7 @@ export default class Logo extends React.Component {
     paper.project.importSVG(path, (logoVector) => {
       // Place the logo vector
       logoVector.name = 'logoVector'
-      logoVector.pivot = logoVector.bounds.topLeft
+      // logoVector.pivot = logoVector.bounds.topLeft
       logoVector.position.x = this.state.margin
       logoVector.position.y = this.state.margin
 
@@ -93,12 +97,18 @@ export default class Logo extends React.Component {
       logoVector.children.map((segment) => {
         segment.on('mousedrag', (event) => {
           if (
-            segment.position.x + event.delta.x > 0 && segment.position.x + event.delta.x < 700 &&
-            segment.position.y + event.delta.y > 0 && segment.position.y + event.delta.y < 700
+            segment.position.x + event.delta.x > -750 && segment.position.x + event.delta.x < 750 &&
+            segment.position.y + event.delta.y > -750 && segment.position.y + event.delta.y < 750
           ) {
             segment.position.x += event.delta.x
             segment.position.y += event.delta.y
           }
+        })
+        segment.on('mouseenter', (event) => {
+          segment.dashArray = [1, segment.strokeWidth * 2]
+        })
+        segment.on('mouseleave', (event) => {
+          segment.dashArray = []
         })
       })
 

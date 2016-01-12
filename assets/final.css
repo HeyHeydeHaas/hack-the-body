@@ -15,6 +15,10 @@ a:hover {
   text-decoration: none;
   border-bottom: 2px solid #666;
 }
+h1 {
+  font-size: 2.5em;
+  color: #fff;
+}
 p {
   margin: 0 0 2em;
 }
@@ -22,6 +26,15 @@ p.lead {
   font-size: 2.5em;
   font-weight: 500;
   line-height: 1.21;
+  font-weight: bold;
+  margin: 0 0 0.5em;
+}
+button.lead {
+  background: #b8635f;
+  color: #ffffff;
+  padding: 1em 1.5em;
+  border: 0;
+  font-size: 0.8em;
 }
 main {
   width: 60%;
@@ -29,22 +42,20 @@ main {
   margin: 3em auto;
 }
 canvas {
-  width: 100%;
-  min-height: 700px;
   cursor: move;
+  position: relative;
 }
 figure.logo {
   float: left;
-  width: 700px;
   position: fixed;
-  left: 20vw;
-  margin-left: -175px;
+  left: 3em;
+  top: 3em;
   z-index: -1;
 }
 article {
   padding: 1em 0;
-  margin: 2em 5em;
-  float: right;
+  position: absolute;
+  right: 4em;
   width: 20em;
 }
 article ul {
@@ -53,12 +64,4 @@ article ul {
 time {
   font-style: italic;
   font-size: 0.6em;
-}
-@media screen and (max-width: 683px) {
-  canvas {
-    min-height: 300px;
-  }
-  figure.logo {
-    width: 300px;
-  }
 }
