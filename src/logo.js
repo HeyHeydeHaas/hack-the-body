@@ -78,7 +78,7 @@ export default class Logo extends React.Component {
     // Bind listeners
     window.addEventListener('resize', this.setSize)
     paper.view.onFrame = (event) => {
-      if (event.count % 200 === 0) {
+      if (event.count % 100 === 0) {
         this.regenerateSegments()
       }
     }
@@ -105,10 +105,7 @@ export default class Logo extends React.Component {
           }
         })
         segment.on('mouseenter', (event) => {
-          segment.dashArray = [1, segment.strokeWidth * 2]
-        })
-        segment.on('mouseleave', (event) => {
-          segment.dashArray = []
+          segment.strokeWidth = this.state.factor * 1.1
         })
       })
 
