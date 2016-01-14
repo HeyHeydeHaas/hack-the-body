@@ -16,7 +16,8 @@ export default class Logo extends React.Component {
       variant: logo.dataset.variant || 'htb',
       factor: logo.dataset.factor || 50,
       margin: logo.dataset.margin || 50,
-      percentage: logo.dataset.percentage / 100 || 1
+      percentage: logo.dataset.percentage / 100 || 1,
+      refreshRate: logo.dataset.refreshRate || 100
     }
 
     // Bind methods
@@ -78,7 +79,7 @@ export default class Logo extends React.Component {
     // Bind listeners
     window.addEventListener('resize', this.setSize)
     paper.view.onFrame = (event) => {
-      if (event.count % 100 === 0) {
+      if (event.count % this.state.refreshRate === 0) {
         this.regenerateSegments()
       }
     }
