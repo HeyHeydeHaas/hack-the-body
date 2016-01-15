@@ -34,7 +34,7 @@ export default class Logo extends React.Component {
       width: newLength,
       height: newLength
     }
-    paper.view.zoom = newLength / 1500
+    paper.view.zoom = newLength / (1500 / paper.view.pixelRatio)
     paper.view.center = (0, 0)
   }
 
@@ -98,8 +98,10 @@ export default class Logo extends React.Component {
       logoVector.children.map((segment) => {
         segment.on('mousedrag', (event) => {
           if (
-            segment.position.x + event.delta.x > -750 && segment.position.x + event.delta.x < 750 &&
-            segment.position.y + event.delta.y > -750 && segment.position.y + event.delta.y < 750
+            segment.position.x + event.delta.x > (-750 / paper.view.pixelRatio) &&
+            segment.position.y + event.delta.y > (-750 / paper.view.pixelRatio) &&
+            segment.position.x + event.delta.x < (750 / paper.view.pixelRatio) &&
+            segment.position.y + event.delta.y < (750 / paper.view.pixelRatio)
           ) {
             segment.position.x += event.delta.x
             segment.position.y += event.delta.y
