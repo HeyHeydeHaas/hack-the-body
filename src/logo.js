@@ -29,11 +29,16 @@ export default class Logo extends React.Component {
    * Forces the viewSize to be 1500x1500, for a scalable canvas
    */
   setSize () {
-    let newLength = window.innerWidth / paper.view.pixelRatio * this.state.percentage
+    let newLength = window.innerWidth * this.state.percentage
     paper.view.viewSize = {
       width: newLength,
       height: newLength
     }
+
+    // Override Paper.js behavior for HiDPI screens
+    logo.width = newLength
+    logo.height = newLength
+
     paper.view.zoom = newLength / 1500
     paper.view.center = (0, 0)
   }
@@ -91,21 +96,14 @@ export default class Logo extends React.Component {
       // Place the logo vector
       logoVector.name = 'logoVector'
       // logoVector.pivot = logoVector.bounds.topLeft
-      logoVector.position.x = this.state.margin / paper.view.pixelRatio
-      logoVector.position.y = this.state.margin / paper.view.pixelRatio
+      logoVector.position.x = this.state.margin
+      logoVector.position.y = this.state.margin
 
       // Bind mouse events
       logoVector.children.map((segment) => {
         segment.on('mousedrag', (event) => {
-          if (
-            segment.position.x + event.delta.x > (-750 / paper.view.pixelRatio) &&
-            segment.position.y + event.delta.y > (-750 / paper.view.pixelRatio) &&
-            segment.position.x + event.delta.x < (750 / paper.view.pixelRatio) &&
-            segment.position.y + event.delta.y < (750 / paper.view.pixelRatio)
-          ) {
-            segment.position.x += event.delta.x
-            segment.position.y += event.delta.y
-          }
+          segment.position.x += event.delta.x
+          segment.position.y += event.delta.y
         })
         segment.on('mouseenter', (event) => {
           segment.strokeWidth = this.state.factor * 1.1
